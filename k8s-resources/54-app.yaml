@@ -1,0 +1,85 @@
+
+# configuration part 2: environment variables
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp
+  labels:
+    service: helloapp
+    component: web
+    team: infrastructure-team
+    criticality: low
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: helloapp
+      component: web
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: helloapp
+        component: web
+        team: infrastructure-team
+        criticality: low
+        version: v1
+    spec:
+      containers:
+      - image: quay.io/alexey_medvedchikov/helloapp:latest
+        name: helloapp
+        args:
+          - "-net.listen=:8080"
+          - "-config.path=/etc/helloapp/config.json"
+        env:
+          - name: DB_DSN
+            value: postgresql://helloapp:mypassword@10.10.10.10/helloapp
+        envFrom:
+          - secretRef:
+              name: helloapp-env
+              optional: false
+        resources: {}
+        volumeMounts:
+          - mountPath: /etc/helloapp
+            name: config
+      volumes:
+        - name: config
+          configMap:
+            name: helloapp
+            optional: false
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helloapp
+  labels:
+    service: helloapp
+    component: web
+    team: infrastructure-team
+    criticality: low
+    version: v1
+data:
+  config.json: |
+    {
+      "text_to_show": "Hello, Scala!"
+    }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: helloapp-env
+  labels:
+    service: helloapp
+    component: web
+    team: infrastructure-team
+    criticality: low
+    version: v1
+type: Opaque
+data:
+  DB_DSN: "cG9zdGdyZXNxbDovL2hlbGxvYXBwOm15cGFzc3dvcmRAMTAuMTAuMTAuMTAvaGVsbG9hcHA="

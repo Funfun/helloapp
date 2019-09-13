@@ -1,0 +1,27 @@
+
+# created by kubectl run --dry-run
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: helloapp
+  name: helloapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: helloapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: helloapp
+    spec:
+      containers:
+      - image: quay.io/alexey_medvedchikov/helloapp:latest
+        name: helloapp
+        resources: {}
+status: {}

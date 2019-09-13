@@ -1,0 +1,33 @@
+
+# labelling
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp
+  labels:
+    service: helloapp
+    component: web
+    team: infrastructure-team
+    criticality: low
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: helloapp
+      component: web
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: helloapp
+        component: web
+        team: infrastructure-team
+        criticality: low
+        version: v1
+    spec:
+      containers:
+      - image: quay.io/alexey_medvedchikov/helloapp:latest
+        name: helloapp
+        resources: {}
